@@ -1,0 +1,31 @@
+{
+  "name": "changan-sav-webhook",
+  "version": "1.0.0",
+  "description": "Changan SAV WhatsApp Flow webhook for satisfaction surveys",
+  "main": "webhook-server.js",
+  "scripts": {
+    "start": "node webhook-server.js",
+    "dev": "node webhook-server.js",
+    "test": "node test-sav-flow.js"
+  },
+  "engines": {
+    "node": ">=18.x"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.0.2",
+    "@upstash/redis": "^1.36.1",
+    "crypto": "^1.0.1",
+    "express": "^4.18.2"
+  },
+  "keywords": [
+    "whatsapp",
+    "webhook",
+    "flow",
+    "changan",
+    "sav",
+    "satisfaction",
+    "survey"
+  ],
+  "author": "Voom Digital",
+  "license": "MIT"
+}

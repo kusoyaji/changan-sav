@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Changan SAV - Réponses Enquête</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #333;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .stat-card h3 {
+            color: #667eea;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+        .stat-card .number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #333;
+        }
+        .stat-card.nps {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        .stat-card.nps h3, .stat-card.nps .number {
+            color: white;
+        }
+        .stat-card.followup {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+        .stat-card.followup h3, .stat-card.followup .number {
+            color: white;
+        }
+        .responses {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .responses h2 {
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        .response-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+        .response-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            color: #666;
+            font-size: 14px;
+        }
+        .response-data {
+            display: grid;
+            gap: 10px;
+        }
+        .response-field {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 15px;
+        }
+        .field-label {
+            font-weight: 600;
+            color: #555;
+        }
+        .field-value {
+            color: #333;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        .empty-state svg {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+        .refresh-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: background 0.3s;
+        }
+        .refresh-btn:hover {
+            background: #5568d3;
+        }
+        .export-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .export-btn:hover {
+            background: #059669;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Enquête SAV Changan</h1>
+            <p>Tableau de bord des réponses clients</p>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <h3>Total Réponses</h3>
+                <div class="number" id="totalCount">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Aujourd'hui</h3>
+                <div class="number" id="todayCount">0</div>
+            </div>
+            <div class="stat-card nps">
+                <h3>Score NPS</h3>
+                <div class="number" id="npsScore">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Satisfaction Moy.</h3>
+                <div class="number" id="avgSatisfaction">0%</div>
+            </div>
+            <div class="stat-card followup">
+                <h3>À Recontacter</h3>
+                <div class="number" id="needsFollowup">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Dernière réponse</h3>
+                <div class="number" id="lastResponse">--:--</div>
+            </div>
+        </div>
+
+        <div class="responses">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2>Réponses récentes</h2>
+                <div class="button-group">
+                    <button class="export-btn" onclick="exportToExcel()">📊 Exporter Excel</button>
+                    <button class="refresh-btn" onclick="loadResponses()">🔄 Actualiser</button>
+                </div>
+            </div>
+            <div id="responsesList"></div>
+        </div>
+    </div>
+
+    <script>
+        async function loadResponses() {
+            const list = document.getElementById('responsesList');
+            list.innerHTML = '<div class="loading">Chargement...</div>';
+
+            try {
+                const response = await fetch('/api/responses');
+                const data = await response.json();
+                
+                // Update stats
+                document.getElementById('totalCount').textContent = data.stats.total || 0;
+                document.getElementById('todayCount').textContent = data.stats.today || 0;
+                document.getElementById('npsScore').textContent = data.stats.npsScore || 0;
+                document.getElementById('avgSatisfaction').textContent = (data.stats.avgSatisfaction || 0) + '%';
+                document.getElementById('needsFollowup').textContent = data.stats.needsFollowup || 0;
+                if (data.stats.lastResponse) {
+                    const time = new Date(data.stats.lastResponse).toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'});
+                    document.getElementById('lastResponse').textContent = time;
+                }
+                
+                // Display responses
+                if (data.responses.length === 0) {
+                    list.innerHTML = `
+                        <div class="empty-state">
+                            <p style="font-size: 18px; margin-bottom: 20px;">📝 Aucune réponse pour le moment</p>
+                            <p style="color: #666;">Les réponses apparaîtront ici une fois que les clients auront complété l'enquête.</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                list.innerHTML = data.responses.map(r => `
+                    <div class="response-item">
+                        <div class="response-meta">
+                            <span>🕐 ${new Date(r.timestamp).toLocaleString('fr-FR')}</span>
+                            <span>📱 ${r.phone || 'Anonyme'}</span>
+                        </div>
+                        <div class="response-data">
+                            ${Object.entries(r.responses || {}).map(([key, value]) => `
+                                <div class="response-field">
+                                    <div class="field-label">${formatFieldName(key)}</div>
+                                    <div class="field-value">${value || 'N/A'}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                list.innerHTML = `<div class="empty-state">❌ Erreur: ${error.message}</div>`;
+            }
+        }
+        
+        function formatFieldName(key) {
+            const names = {
+                'accueil_courtoisie': 'Accueil & Courtoisie',
+                'accueil_courtoisie_raison': 'Raison accueil',
+                'delais_respectes': 'Délais respectés',
+                'qualite_service': 'Qualité du service',
+                'qualite_service_raison': 'Raison qualité',
+                'note_recommandation': 'Note recommandation',
+                'remarques': 'Remarques',
+                'recontact': 'Recontact'
+            };
+            return names[key] || key;
+        }
+        
+        function exportToExcel() {
+            window.location.href = '/api/export';
+        }
+
+        // Load on page load
+        loadResponses();
+        
+        // Auto-refresh every 10 seconds
+        setInterval(loadResponses, 10000);
+    </script>
+</body>
+</html>
