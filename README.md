@@ -1,294 +1,176 @@
-# Changan SAV - Service Après-Vente WhatsApp Flow
-## Complete Setup Guide
+# Changan SAV - WhatsApp Flow Survey System
 
-This is a **separate project** for Changan's after-sales satisfaction survey, using the same Voom Digital credentials but with its own webhook and database.
+Automated satisfaction survey system for Changan Morocco using WhatsApp Flows with PostgreSQL database, analytics, and Excel export.
 
----
+## 🚀 Features
 
-## 📋 Project Overview
+- ✅ **WhatsApp Flow Integration** - 8-screen satisfaction survey with conditional logic
+- ✅ **End-to-End Encryption** - RSA + AES-GCM encryption for data security
+- ✅ **PostgreSQL Database** - Neon serverless database with auto-scaling
+- ✅ **Auto-Calculated Analytics** - NPS scores, satisfaction metrics, sentiment analysis
+- ✅ **Excel Export** - One-click CSV export with 22 formatted columns
+- ✅ **Real-Time Dashboard** - Live statistics and response tracking
+- ✅ **Zero Manual Intervention** - Fully automated with auto-table creation
 
-**Purpose**: Collect customer satisfaction feedback after service visits via WhatsApp Flow
+## 📊 Survey Questions
 
-**Survey Questions**:
-1. Accueil et courtoisie de l'équipe (with optional "pourquoi")
-2. Respect des délais annoncés (Oui/Non)
-3. Qualité du service rendu (with optional "pourquoi")
-4. Note de recommandation (1-10)
-5. Remarques et suggestions (optional)
-6. Souhait d'être recontacté (Oui/Non)
+1. **Accueil et Courtoisie** - Reception & courtesy rating
+2. **Délais Respectés** - Were deadlines met?
+3. **Qualité du Service** - Service quality rating
+4. **Note de Recommandation** - NPS score (0-10)
+5. **Remarques** - Additional comments
+6. **Recontact** - Follow-up request
 
-**Total Pages**: 8 (6 main questions + 2 conditional "pourquoi" pages)
+## 🗄️ Database Schema
 
----
+24 columns including:
+- **Survey fields** (8) - All form responses
+- **Analytics** (5) - Satisfaction score, NPS category, sentiment, followup flag
+- **Time data** (6) - Week, month, day, hour for trend analysis
+- **Metadata** (5) - IDs, timestamps, raw JSON backup
 
-## 🚀 Quick Start
+## 🛠️ Tech Stack
 
-### Step 1: Install Dependencies
+- **Backend**: Node.js, Vercel Serverless Functions
+- **Database**: Neon PostgreSQL (serverless)
+- **Encryption**: Node.js crypto (RSA-2048, AES-128-GCM)
+- **Frontend**: Vanilla HTML/CSS/JavaScript
+- **API**: WhatsApp Business API (Meta)
 
-```bash
-cd changan-sav
-npm install
-```
+## 📦 Installation
 
-### Step 2: Generate Encryption Keys
+### Prerequisites
 
-```bash
-node ../generate-keys.js
-```
+- Node.js 18+
+- Vercel account
+- Neon database account
+- WhatsApp Business account with Flow access
 
-Save the output:
-- **Private Key** → Use in environment variables
-- **Public Key** → Upload to WhatsApp Flow settings
-- **Passphrase** → Use in environment variables
+### Setup
 
-### Step 3: Create WhatsApp Flow
+1. **Clone repository**
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/changan-sav.git
+   cd changan-sav
+   ```
 
-1. Go to [Facebook Business Manager](https://business.facebook.com/)
-2. Navigate to **WhatsApp Manager** → **Flows**
-3. Click **Create Flow**
-4. Name it: "Changan SAV Satisfaction Survey"
-5. Upload `whatsapp-sav-flow.json`
-6. In Flow Settings → **Endpoint Configuration**:
-   - Set webhook URL (will be your Vercel URL + `/flow`)
-   - Upload the **Public Key** from Step 2
-7. **Publish the Flow**
-8. Copy the **Flow ID** (you'll need this)
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-### Step 4: Create Upstash Redis Database
+3. **Create Neon database**
+   - Go to https://neon.tech/
+   - Create project: `changan-sav`
+   - Region: Europe (Frankfurt)
+   - Copy connection string
 
-1. Go to [Upstash Console](https://console.upstash.com/)
-2. Click **Create Database**
-3. Name: `changan-sav-surveys`
-4. Region: Choose closest to your users
-5. Copy:
-   - `UPSTASH_REDIS_REST_URL`
-   - `UPSTASH_REDIS_REST_TOKEN`
+4. **Configure environment variables**
+   
+   Add to Vercel dashboard:
+   ```
+   DATABASE_URL=postgresql://user:password@...
+   CHANGAN_PRIVATE_KEY=[Your RSA private key]
+   ```
 
-### Step 5: Configure Environment Variables
+5. **Deploy to Vercel**
+   ```bash
+   vercel --prod
+   ```
 
-Create `.env` file (copy from `.env.example`):
+6. **Configure WhatsApp Flow**
+   - Upload public key to WhatsApp
+   - Set endpoint URL to your Vercel deployment
+   - Publish Flow
 
-```bash
-cp .env.example .env
-```
+## 📖 Documentation
 
-Edit `.env` with your values:
+- [Complete Setup Guide](COMPLETE-SETUP-GUIDE.md) - Full walkthrough
+- [Database Setup](SETUP-POSTGRES.md) - Neon database configuration
+- [Flow Setup](FLOW-SETUP-GUIDE.md) - WhatsApp Flow creation
+- [Encryption Guide](ENCRYPTION-SOLUTION.md) - Security implementation
+- [Neon Migration](NEON-SETUP.md) - Database migration from Vercel Postgres
 
-```env
-# WhatsApp (Voom Digital - same as main project)
-WHATSAPP_ACCESS_TOKEN=EAFgpN5lxPgUBOT9y6Uo9N0KA5rZBMYYDVvbBnHzBSBey430X1nx8f2HNrtM9C9qI4JyZAnhlcX06YpsZAjQPZBiZBdPiWorxIcIitKioGxFbPlkGvysNLnfjKNsaIULIq3u0CNpKN70ZCUZAHIMZCpUbmHOf7SkUH55b2KeyEEZCQMZAqAgQSy5G5KBJXvXjVxQAZDZD
-PHONE_NUMBER_ID=978792171974983
+## 🔐 Security
 
-# Your Flow ID from Step 3
-SAV_FLOW_ID=YOUR_FLOW_ID_HERE
+- End-to-end encryption using RSA-2048 + AES-128-GCM
+- Private keys stored as Vercel environment variables
+- No sensitive data in code or logs
+- HTTPS-only communication
+- Database encryption at rest
 
-# Webhook token (use when setting up webhook)
-WHATSAPP_VERIFY_TOKEN=changan_sav_webhook_verify_2026_secure
+## 📈 Analytics
 
-# Keys from Step 2
-CHANGAN_PRIVATE_KEY=-----BEGIN ENCRYPTED PRIVATE KEY-----
-...your key...
------END ENCRYPTED PRIVATE KEY-----
-CHANGAN_PASSPHRASE=your_passphrase
+### Dashboard Metrics
+- Total responses (all time)
+- Today's submissions
+- NPS score (-100 to +100)
+- Average satisfaction percentage
+- Customers needing follow-up
+- Last response timestamp
 
-# Database from Step 4
-CHANGAN_KV_REST_API_URL=https://xxxxx.upstash.io
-CHANGAN_KV_REST_API_TOKEN=your_token
-```
+### Excel Export Columns
+- Basic info (ID, Date/Time, Phone)
+- Survey responses (8 fields)
+- Analytics (NPS, satisfaction, sentiment, followup flag)
+- Time data (week, month, day, hour)
 
-### Step 6: Test Locally
+## 🚦 API Endpoints
 
-```bash
-npm start
-```
+### `POST /api/flow`
+Main WhatsApp Flow endpoint
+- Handles encrypted ping (health check)
+- Processes survey submissions
+- Auto-initializes database
+- Returns encrypted responses
 
-Server runs on `http://localhost:3001`
+### `GET /api/responses`
+Retrieve survey data
+- Returns stats + recent 50 responses
+- Includes analytics for each response
 
-Test sending a survey:
-```bash
-node test-sav-flow.js +212600000000 "Ahmed"
-```
+### `GET /api/export`
+Export to Excel
+- Downloads CSV with all data
+- UTF-8 BOM for Excel compatibility
+- French headers and values
 
-### Step 7: Deploy to Vercel
+## 🌍 Deployment
 
-```bash
-# Login to Vercel
-npx vercel login
+Deployed on Vercel with:
+- Production URL: https://y-gamma-six-62.vercel.app/
+- Auto-scaling serverless functions
+- CDN for static assets
+- Automatic HTTPS
 
-# Deploy
-npx vercel
+## 📊 Database Performance
 
-# Set environment variables in Vercel dashboard
-# Or use CLI:
-npx vercel env add WHATSAPP_ACCESS_TOKEN
-npx vercel env add PHONE_NUMBER_ID
-npx vercel env add SAV_FLOW_ID
-npx vercel env add CHANGAN_PRIVATE_KEY
-npx vercel env add CHANGAN_PASSPHRASE
-npx vercel env add WHATSAPP_VERIFY_TOKEN
-npx vercel env add CHANGAN_KV_REST_API_URL
-npx vercel env add CHANGAN_KV_REST_API_TOKEN
+**Free Tier (Neon):**
+- 3 GB storage = ~3 million surveys
+- 0.5 GB transfer/month
+- Autoscaling compute
+- 24/7 availability
 
-# Deploy to production
-npx vercel --prod
-```
+## 🤝 Contributing
 
-Your webhook URL will be: `https://your-project.vercel.app`
+This is a private project for Changan Morocco. For issues or improvements, contact the development team.
 
-### Step 8: Configure WhatsApp Webhook
+## 📝 License
 
-1. Go to [Facebook Developers](https://developers.facebook.com/)
-2. Select **Voom Digital** app
-3. Go to **WhatsApp** → **Configuration**
-4. Click **Edit** on Webhook
-5. Enter:
-   - **Callback URL**: `https://your-project.vercel.app/webhook`
-   - **Verify Token**: `changan_sav_webhook_verify_2026_secure`
-6. Click **Verify and Save**
-7. Subscribe to **messages** webhook field
+Proprietary - Voom Digital © 2026
 
-### Step 9: Update Flow Endpoint
+## 👥 Credits
 
-1. Go back to your Flow in WhatsApp Manager
-2. Settings → **Endpoint Configuration**
-3. Update endpoint URL to: `https://your-project.vercel.app/flow`
-4. Save and **Re-publish** the flow
-
----
-
-## 🧪 Testing
-
-### Test 1: Send Survey Flow
-```bash
-node test-sav-flow.js +212600123456 "Test User"
-```
-
-### Test 2: Check Webhook Health
-```bash
-curl https://your-project.vercel.app/
-```
-
-### Test 3: View Submissions
-```bash
-curl https://your-project.vercel.app/admin/surveys
-```
-
-### Test 4: Manual Survey Trigger
-```bash
-curl -X POST https://your-project.vercel.app/api/send-survey \
-  -H "Content-Type: application/json" \
-  -d '{"phone": "+212600123456", "name": "Ahmed"}'
-```
-
----
-
-## 📊 Monitoring
-
-### View All Survey Responses
-Open: `https://your-project.vercel.app/admin/surveys`
-
-### Check Database
-Go to Upstash Console → Select your database → Data Browser
-
-### Vercel Logs
-```bash
-npx vercel logs
-```
-
----
-
-## 🔐 Security Notes
-
-1. **Never commit `.env` file**
-2. **Use different Redis database** than main project
-3. **Rotate access tokens** regularly
-4. **Keep private keys secure**
-5. **Use strong passphrases**
-
----
-
-## 🆘 Troubleshooting
-
-### Flow not sending?
-- Check SAV_FLOW_ID is correct
-- Verify Flow is published
-- Check access token is valid
-
-### Webhook not receiving data?
-- Verify webhook URL in Facebook settings
-- Check Vercel deployment logs
-- Ensure private key matches public key uploaded to Flow
-
-### Database not saving?
-- Check Redis credentials
-- Verify Upstash database is active
-- Check Vercel environment variables
-
-### Decryption errors?
-- Ensure private key format is correct
-- Check passphrase matches
-- Verify public key uploaded to Flow
-
----
+**Developed by**: Voom Digital  
+**Client**: Changan Morocco  
+**Platform**: WhatsApp Business API (Meta)
 
 ## 📞 Support
 
-For issues or questions:
-- Check Vercel logs: `npx vercel logs`
-- Check Upstash database status
-- Verify all environment variables are set
+For technical support or questions about the system, refer to the documentation files in this repository.
 
 ---
 
-## 📁 File Structure
-
-```
-changan-sav/
-├── webhook-server.js          # Main webhook server
-├── whatsapp-sav-flow.json    # Flow definition (8 pages)
-├── test-sav-flow.js          # Test script
-├── package.json              # Dependencies
-├── vercel.json               # Vercel deployment config
-├── .env.example              # Environment variables template
-└── README.md                 # This file
-```
-
----
-
-## 🔄 Workflow
-
-1. Customer receives WhatsApp message with Flow button
-2. Customer clicks "Commencer"
-3. Flow displays 6 questions (+ 2 conditional)
-4. Customer submits survey
-5. Data sent to `/flow` endpoint (encrypted)
-6. Webhook decrypts and saves to Redis
-7. Success message shown to customer
-8. Admin can view responses at `/admin/surveys`
-
----
-
-## ✅ Checklist
-
-- [ ] Dependencies installed
-- [ ] Encryption keys generated
-- [ ] WhatsApp Flow created and published
-- [ ] Flow ID obtained
-- [ ] Upstash Redis database created
-- [ ] Environment variables configured
-- [ ] Local testing successful
-- [ ] Deployed to Vercel
-- [ ] Webhook configured in Facebook
-- [ ] Flow endpoint updated
-- [ ] End-to-end test completed
-
----
-
-## 📝 Notes
-
-- This project is **separate** from enseignement/prepa flows
-- Uses **same Voom Digital credentials** (access token, phone number)
-- Uses **different port** (3001 vs 3000)
-- Uses **separate Redis database**
-- Can be deployed to **different Vercel project**
-- Compatible with Changan's WhatsApp Business Account (once they provide access)
+**Status**: ✅ Production Ready  
+**Version**: 1.0.0  
+**Last Updated**: February 2026
